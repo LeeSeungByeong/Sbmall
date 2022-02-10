@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.docmall.mapper.MemberMapper">
+
+	<insert id="join" parameterType="com.docmall.domain.MemberVO">
+		
+		INSERT INTO mbsp_tbl(
+			mbsp_id, 
+			mbsp_password, 
+			mbsp_name, 
+			mbsp_email, 
+			mbsp_zipcode, 
+			mbsp_addr, 
+			mbsp_deaddr, 
+			mbsp_phone, 
+			mbsp_receive
+			)
+		VALUES(
+			#{mbsp_id},
+			#{mbsp_password},
+			#{mbsp_name},
+			#{mbsp_email},
+			#{mbsp_zipcode},
+			#{mbsp_addr},
+			#{mbsp_deaddr},
+			#{mbsp_phone},
+			#{mbsp_receive}
+		)
+		
+	</insert>
+	
+	<select id="checkID" resultType="string">
+	
+		SELECT 
+			mbsp_id 
+		FROM 
+			mbsp_tbl
+		WHERE 
+			mbsp_id = #{mbsp_id}
+	
+	</select>
+	
+	<select id="login" resultType="com.docmall.domain.MemberVO">
+	
+		SELECT
+			mbsp_id, mbsp_password, mbsp_name, mbsp_email, mbsp_zipcode, mbsp_addr, mbsp_deaddr, mbsp_phone, mbsp_receive, mbsp_point, mbsp_datesub, mbsp_updatedate, mbsp_lastlogin
+		FROM
+			mbsp_tbl
+		WHERE 
+			mbsp_id = #{mbsp_id}
+	
+	</select>
+	
+	<update id="modify">
+	
+		UPDATE
+			mbsp_tbl
+		SET
+			mbsp_email = #{mbsp_email}, 
+			mbsp_zipcode = #{mbsp_zipcode}, 
+			mbsp_addr = #{mbsp_addr}, 
+			mbsp_deaddr = #{mbsp_deaddr}, 
+			mbsp_phone = #{mbsp_phone}, 
+			mbsp_receive = #{mbsp_receive},
+			mbsp_updatedate = sysdate
+			
+		WHERE
+			mbsp_id = #{mbsp_id}
+	
+	</update>
+
+</mapper>  
