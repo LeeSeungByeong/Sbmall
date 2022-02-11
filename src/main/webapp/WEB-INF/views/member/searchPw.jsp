@@ -48,32 +48,19 @@
 
   
   <div class="row">
-    <h3>로그인 폼</h3>
+    <h3>비밀번호찾기 폼</h3>
     <div class="container">
       <form>
         <div class="form-group row">
-          <label for="mbsp_id" class="col-sm-2 col-form-label">ID</label>
-          <div class="col-sm-10">
-            <input type="text" class="form-control" id="mbsp_id" name="mbsp_id" placeholder="ID">
+          <label for="mbsp_email" class="col-sm-2 col-form-label"> 전자우편 주소입력</label>
+          <div class="col-sm-12">
+            <input type="text" class="form-control" id="mbsp_email" name="mbsp_email" placeholder="abc@docmall.com">
           </div>
         </div>
+                
         <div class="form-group row">
-          <label for="mbsp_password" class="col-sm-2 col-form-label">Password</label>
-          <div class="col-sm-10">
-            <input type="password" class="form-control" id="mbsp_password" name="mbsp_password" placeholder="Password">
-          </div>
-        </div>
-		 
-        <div class="form-group row">
-          <label class="col-sm-2"></label>
-          <div class="col-sm-10">
-          	<button type="button" class="btn btn-link" id="btnSearchPw">Search Pw</button>
-          </div>
-        </div>
-        
-        <div class="form-group row">
-          <div class="offset-sm-2 col-sm-10">
-            <button type="button" id="btnLogin" class="btn btn-primary">Sign in</button>
+          <div class="col-sm-12">
+            <button type="button" id="btnMailSend" class="btn btn-primary">메일전송하기</button>
           </div>
         </div>
       </form>
@@ -129,9 +116,40 @@
         });
       });
       
+      // 비밀번호 찾기폼
       $("#btnSearchPw").on("click", function(){
     	 location.href = "/member/searchPw"; 
       });
+      
+      //비밀번호 찾기 메일발송
+      $("#btnMailSend").on("click", function(){
+
+        let mbsp_email = $("#mbsp_email");
+
+        if(mbsp_email.val() == "" || mbsp_email.val() == null){
+          alert("가입하신 메일주소를 입력하세요.");
+          mbsp_email.focus();
+          return;
+        }
+
+        $.ajax({
+          url: '/member/searchPw',
+          type: 'post',
+          dataType: 'text',
+          data: { mbsp_email : mbsp_email.val() },
+          success: function(data){
+            
+            if(data == "success"){
+              alert("임시비밀번호가 메일발송되었습니다.\n변경바랍니다.");
+            }else if(data == "fail"){
+              alert("메일발송시 문제가 발생했습니다. 다시 진행해주세요.\n 문제가 발생시 관리자에게 연락주세요.");
+            }else if(data == "noMail"){
+              alert("가입하신 메일주소가 다릅니다. 확인하여 주세요.");
+            }
+          } 
+        });
+      });
+      
     });
 
   </script>  

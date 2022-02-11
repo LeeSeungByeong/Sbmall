@@ -36,7 +36,7 @@ import lombok.extern.log4j.Log4j;
 public class MemberController {
 
 	@Inject
-	private PasswordEncoder cryptPassEnc;
+	private PasswordEncoder cryptPassEnc;  // 스프링시큐리티에서 제공하는 암호화클래스
 	
 	@Inject
 	private MemberService service;
@@ -153,7 +153,7 @@ public class MemberController {
 	
 	
 	
-	// 회원가입시 메일인증코드 생성
+	// 회원가입시 메일인증코드 생성. 임시비밀번호 용도로 같이사용.
 	private String makeAuthCode() {
 		
 		String authCode = "";
@@ -167,7 +167,8 @@ public class MemberController {
 	}
 
 	//회원수정 폼 : 로그인한 사용자의 정보를 폼에 표시.
-	@GetMapping("/modify")
+	//마이페이지 : 같이 사용.
+	@GetMapping(value = {"/modify", "/mypage"})
 	public void modify(HttpSession session, Model model) {
 		
 		MemberVO vo = (MemberVO) session.getAttribute("loginStatus");
@@ -229,6 +230,24 @@ public class MemberController {
 	
 	
 	//회원삭제
+	@ResponseBody
+	@PostMapping("/regDelete")
+	public ResponseEntity<String> regDelete(@RequestParam("mbsp_password") String mbsp_password, HttpSession session){
+		
+		ResponseEntity<String> entity = null;
+		
+		
+		MemberVO vo = (MemberVO) session.getAttribute("loginStatus");
+		
+		String mbsp_id = vo.getMbsp_id();
+		
+		entity = new ResponseEntity<String>(String.valueOf(service.regDelete(mbsp_id, cryptPassEnc, mbsp_password)), HttpStatus.OK);
+		
+		
+		return entity;
+	}
+	
+	
 	
 	
 	//로그인폼  /member/login
@@ -280,14 +299,113 @@ public class MemberController {
 		return "redirect:/";
 	}
 	
+	//비밀번호 찾기 폼
+	@GetMapping("/searchPw")
+	public void searchPwReq() {
+	
+		
+		
+	}
+	
+	//비밀번호 찾기 기능
+	@ResponseBody
+	@PostMapping("/searchPw")
+	public ResponseEntity<String> searchPwAction(@RequestParam("mbsp_email") String mbsp_email) {
+	
+		/*
+		1)email 주소가 가입된 것인지에 따른 회원가입여부체크
+		  - 존재 : 비밀번호를 랜덤으로 생성하여, 메일발송
+		  - 존재안함 : 메세지준다.(가입된 메일주소가 다르거나 미가입된 회원입니다.)
+		*/
+				
+		ResponseEntity<String> entity = null;
+		
+		//비밀번호 랜덤생성,메일발송
+		if(!StringUtils.isEmpty(service.searchPwByEmail(mbsp_email))) {
+			
+			String tempPw = makeAuthCode();
+			
+			EmailDTO dto = new EmailDTO("docmall", "newcomsa@nate.com", mbsp_email, "docmall 인증메일", tempPw);
+			
+			//메일내용을 구성하는 클래스
+			MimeMessage message = mailSender.createMimeMessage();
+			
+			
+			try {
+				//받는 사람 메일설정
+				message.addRecipient(RecipientType.TO, new InternetAddress(mbsp_email));
+				//보내는 사람설정(이메일, 이름)
+				message.addFrom(new InternetAddress[] {new InternetAddress(dto.getSenderMail(), dto.getSenderName())});
+				//제목
+				message.setSubject(dto.getSubject(), "utf-8");
+				//본문내용(인증코드)
+				message.setText(dto.getMessage(), "utf-8");
+				
+				mailSender.send(message);
+				
+				
+				// 임시비밀번호를 암호화처리하여, 디비에 저장해야 함..
+				
+				String encryptPw = cryptPassEnc.encode(tempPw);
+				service.changePw(mbsp_email, encryptPw);
+				
+				entity = new ResponseEntity<String>("success", HttpStatus.OK);
+				
+			}catch(Exception e) {
+				
+				e.printStackTrace();
+				
+				entity = new ResponseEntity<String>("fail", HttpStatus.BAD_REQUEST);
+			}
+			
+		}else { // 이메일이 존재하지 않은 경우
+			
+			entity = new ResponseEntity<String>("noMail", HttpStatus.OK);
+		}
+		
+		
+		return entity;
+	}
+	
+	//비밀번호 변경하기
+	@ResponseBody
+	@PostMapping("/changePw")
+	public ResponseEntity<String> changePw(@RequestParam("cur_mbsp_password") String cur_mbsp_password, @RequestParam("change_mbsp_password") String change_mbsp_password, HttpSession session){
+		
+		ResponseEntity<String> entity = null;
+		
+		
+		MemberVO vo = (MemberVO) session.getAttribute("loginStatus");
+		
+		String mbsp_id = vo.getMbsp_id();
+		
+		
+		log.info("파라미터: " + mbsp_id);
+		log.info("파라미터: " + cur_mbsp_password);
+		log.info("파라미터: " + change_mbsp_password);
+		
+		
+		//String result = service.currentPwConfirm(mbsp_id, cryptPassEnc.encode(cur_mbsp_password), cryptPassEnc.encode(change_mbsp_password));
+		
+		
+		String result = service.currentPwConfirm(mbsp_id, cryptPassEnc, cur_mbsp_password, cryptPassEnc.encode(change_mbsp_password));
+		
+		entity = new ResponseEntity<String>(result, HttpStatus.OK);
+		
+		
+		return entity;
+	}
+	
 	
 	
 	
 	//마이페이지
+	/*
 	@GetMapping("/mypage")
 	public void mypage() {
 		
 	}
+	*/
 	
 	
 	//아이디및비밀번호 찾기

@@ -53,6 +53,50 @@
 	
 	</select>
 	
+	<select id="searchPwByEmail" resultType="string">
+	
+		SELECT 
+			mbsp_email 
+		FROM 
+			mbsp_tbl
+		WHERE 
+			mbsp_email = #{mbsp_email}
+	
+	</select>
+	
+	<update id="changePw">
+	
+		UPDATE
+			mbsp_tbl
+		SET 
+			mbsp_password = #{mbsp_password}
+		WHERE
+			mbsp_email = #{mbsp_email}
+	
+	</update>
+	
+	<select id="currentPwConfirm" resultType="string">
+	
+		SELECT 
+			mbsp_password 
+		FROM 
+			mbsp_tbl
+		WHERE 
+			mbsp_id = #{mbsp_id} 
+	
+	</select>
+	
+	<update id="changeNewPw">
+	
+		UPDATE
+			mbsp_tbl
+		SET 
+			mbsp_password = #{change_mbsp_password}
+		WHERE
+			mbsp_id = #{mbsp_id}
+	
+	</update>
+	
 	<update id="modify">
 	
 		UPDATE
@@ -70,5 +114,15 @@
 			mbsp_id = #{mbsp_id}
 	
 	</update>
+	
+	<delete id="regDelete">
+	
+		DELETE FROM
+			mbsp_tbl
+		WHERE
+			mbsp_id = #{mbsp_id}
+	
+	
+	</delete>
 
 </mapper>  

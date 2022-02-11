@@ -23,7 +23,7 @@
     	
     </c:if>
     
-    <a class="p-2 text-dark" href="#">MYPAGE</a>
+    <a class="p-2 text-dark" href="/member/mypage">MYPAGE</a>
     <a class="p-2 text-dark" href="#">ORDER</a>
     <a class="p-2 text-dark" href="#">CART</a>
   </nav>
