@@ -97,4 +97,10 @@ public class MemberServiceImpl implements MemberService {
 		return count;
 	}
 
+	@Override
+	public String searchIdByEmail(String mbsp_email) {
+		// TODO Auto-generated method stub
+		return mapper.searchIdByEmail(mbsp_email);
+	}
+
 }

@@ -408,10 +408,52 @@ public class MemberController {
 	*/
 	
 	
-	//아이디및비밀번호 찾기
-	@GetMapping("/searchIDPW")
-	public void searchIDPW() {
+	//아이디 찾기
+	@ResponseBody
+	@PostMapping("/searchId")
+	public ResponseEntity<String> searchIdAction(@RequestParam("mbsp_email") String mbsp_email) {
+	
+		ResponseEntity<String> entity = null;
 		
+		String mbsp_id = service.searchIdByEmail(mbsp_email);
+		
+		//비밀번호 랜덤생성,메일발송
+		if(!StringUtils.isEmpty(mbsp_id)) {
+			
+			EmailDTO dto = new EmailDTO("docmall", "newcomsa@nate.com", mbsp_email, "docmall 인증메일", mbsp_id);
+			
+			//메일내용을 구성하는 클래스
+			MimeMessage message = mailSender.createMimeMessage();
+			
+			
+			try {
+				//받는 사람 메일설정
+				message.addRecipient(RecipientType.TO, new InternetAddress(mbsp_email));
+				//보내는 사람설정(이메일, 이름)
+				message.addFrom(new InternetAddress[] {new InternetAddress(dto.getSenderMail(), dto.getSenderName())});
+				//제목
+				message.setSubject(dto.getSubject(), "utf-8");
+				//본문내용(인증코드)
+				message.setText(dto.getMessage(), "utf-8");
+				
+				mailSender.send(message);
+				
+				entity = new ResponseEntity<String>("success", HttpStatus.OK);
+				
+			}catch(Exception e) {
+				
+				e.printStackTrace();
+				
+				entity = new ResponseEntity<String>("fail", HttpStatus.BAD_REQUEST);
+			}
+			
+		}else { // 이메일이 존재하지 않은 경우
+			
+			entity = new ResponseEntity<String>("noMail", HttpStatus.OK);
+		}
+		
+		
+		return entity;
 	}
 	
 }

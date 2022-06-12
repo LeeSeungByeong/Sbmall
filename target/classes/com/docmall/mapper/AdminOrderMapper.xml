@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.docmall.mapper.AdminOrderMapper">
+
+	<select id="getListWithPaging" resultType="com.docmall.domain.OrderVO">
+	
+		<![CDATA[ 
+		SELECT 
+			ord_code, 
+        	mbsp_id, 
+        	ord_name, 
+        	ord_zipcode, 
+        	ord_addr_basic, 
+        	ord_addr_detail, 
+        	ord_tel, 
+        	ord_price, 
+        	ord_regdate, 
+        	ord_message, 
+        	ord_state, 
+        	ord_depositor
+			
+		FROM (
+		        SELECT 
+		        	/*+ index_desc(order_tbl pk_order_tbl) */ 
+		        	rownum rn,
+		        	ord_code, 
+		        	mbsp_id, 
+		        	ord_name, 
+		        	ord_zipcode, 
+		        	ord_addr_basic, 
+		        	ord_addr_detail, 
+		        	ord_tel, 
+		        	ord_price, 
+		        	ord_regdate, 
+		        	ord_message, 
+		        	ord_state, 
+		        	ord_depositor
+				FROM 
+					order_tbl
+				WHERE 
+		]]>     
+		    
+		<include refid="criteria"></include>
+		
+		<![CDATA[     
+				    rownum <= (#{pageNum} * #{amount}) 
+				)
+		
+		WHERE 
+			rn > ((#{pageNum} - 1) * #{amount} )
+		]]>
+	
+	</select>
+	
+	<select id="getTotalCount" resultType="int">
+		SELECT 
+			count(*) 
+		FROM 
+			order_tbl 
+		WHERE
+		
+		<include refid="criteria"></include> 
+		
+		ord_code > 0
+		
+	</select>
+	
+	<sql id="criteria">
+		<trim prefix="(" suffix=") AND " prefixOverrides="OR">
+			<foreach item="type" collection="typeArr">
+				<trim prefix="OR">
+					<choose>
+						<when test="type == 'N'.toString()">
+							ord_name like '%' || #{keyword} || '%'
+						</when>
+						<when test="type == 'C'.toString()">
+							ord_code like '%' || #{keyword} || '%'
+						</when>
+					</choose>
+				</trim>
+			</foreach>
+		</trim> 
+	</sql>
+	
+	<update id="orderStateChange">
+	
+		UPDATE 
+			order_tbl
+		SET
+			ord_state = #{ord_state}
+		WHERE
+			ord_code = #{ord_code}
+	
+	</update>
+
+
+</mapper>  

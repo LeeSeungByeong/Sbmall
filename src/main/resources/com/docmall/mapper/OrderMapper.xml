@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.docmall.mapper.OrderMapper">
+
+	<select id="directOrderInfo" resultType="com.docmall.domain.OrderInfoVO">
+	
+		SELECT 
+			pro_num,
+			pro_name, 
+			pro_img, 
+			pro_uploadpath,
+			pro_price * #{ord_amount} as orderprice
+		FROM 
+			product_tbl
+		WHERE 
+			pro_num = #{pro_num}
+	
+	</select>
+	
+	<select id="orderInfo" resultType="com.docmall.domain.OrderInfoVO">
+	
+		SELECT 
+			p.pro_num,
+			p.pro_name, 
+			p.pro_img, 
+			p.pro_uploadpath,
+			c.cart_amount, 
+			p.pro_price * c.cart_amount as orderprice
+		FROM 
+			cart_tbl c inner join product_tbl p
+		ON 
+			c.pro_num = p.pro_num
+		AND 
+			c.mbsp_id = #{mbsp_id}
+	
+	</select>
+	
+	<insert id="orderInsert" parameterType="com.docmall.domain.OrderVO">
+		<!-- BoardVO클래스의 bno변수값이 시퀀스값으로 채워진다.  -->
+		<selectKey keyProperty="ord_code" order="BEFORE" resultType="Integer">
+			SELECT 
+				seq_order_code.nextval 
+			FROM 
+				dual
+		</selectKey>
+		
+		INSERT INTO 
+			order_tbl
+			(
+				ord_code, 
+				mbsp_id, 
+				ord_name, 
+				ord_zipcode, 
+				ord_addr_basic, 
+				ord_addr_detail, 
+				ord_tel, 
+				ord_price, 
+				ord_message, 
+				ord_depositor
+			)
+		VALUES
+			(
+				#{ord_code},
+				#{mbsp_id},
+				#{ord_name},
+				#{ord_zipcode},
+				#{ord_addr_basic},
+				#{ord_addr_detail},
+				#{ord_tel},
+				#{ord_price},
+				#{ord_message},
+				#{ord_depositor}
+			)
+	
+	</insert>
+	
+	<insert id="orderDetailInsert" parameterType="com.docmall.domain.OrderDetail">
+				
+		INSERT INTO 
+			ordetail_tbl
+			(
+				ord_code, 
+				pro_num, 
+				dt_amount, 
+				dt_price
+			)
+		VALUES
+			(
+				#{ord_code},
+				#{pro_num},
+				#{dt_amount},
+				#{dt_price}				
+			)
+	
+	</insert>
+
+</mapper>  

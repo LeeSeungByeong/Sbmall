@@ -36,14 +36,25 @@
         <li class="active"><a href="#"><i class="fa fa-link"></i> <span>Link</span></a></li>
         <li><a href="#"><i class="fa fa-link"></i> <span>Another Link</span></a></li>
         <li class="treeview">
+          <a href="#"><i class="fa fa-link"></i> <span>관리자기능</span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="/admin/adminRegister">관리자회원추가</a></li>
+            
+          </ul>
+        </li>
+        <li class="treeview">
           <a href="#"><i class="fa fa-link"></i> <span>상품관리</span>
             <span class="pull-right-container">
                 <i class="fa fa-angle-left pull-right"></i>
               </span>
           </a>
           <ul class="treeview-menu">
-            <li><a href="#">상품등록</a></li>
-            <li><a href="#">상품리스트</a></li>
+            <li><a href="/admin/product/productInsert">상품등록</a></li>
+            <li><a href="/admin/product/productList">상품리스트</a></li>
           </ul>
         </li>
         <li class="treeview">
@@ -53,8 +64,7 @@
               </span>
           </a>
           <ul class="treeview-menu">
-            <li><a href="#">Link in level 2</a></li>
-            <li><a href="#">Link in level 2</a></li>
+            <li><a href="/admin/order/orderList">주문리스트</a></li>
           </ul>
         </li>
         <li class="treeview">

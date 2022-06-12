@@ -17,6 +17,8 @@ public interface MemberService {
 	
 	public String searchPwByEmail(String mbsp_email);
 	
+	public String searchIdByEmail(String mbsp_email);
+	
 	public int changePw(String mbsp_email, String mbsp_password);
 	
 	public String currentPwConfirm(String mbsp_id, PasswordEncoder cryptPassEnc, String cur_mbsp_password, String change_mbsp_password);

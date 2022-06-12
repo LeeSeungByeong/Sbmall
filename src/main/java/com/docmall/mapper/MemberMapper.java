@@ -16,6 +16,8 @@ public interface MemberMapper {
 	
 	public String searchPwByEmail(String mbsp_email);
 	
+	public String searchIdByEmail(String mbsp_email);
+	
 	public int changePw(@Param("mbsp_email") String mbsp_email, @Param("mbsp_password") String mbsp_password);
 	
 	public String currentPwConfirm(String mbsp_id);
